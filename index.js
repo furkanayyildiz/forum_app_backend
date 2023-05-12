@@ -6,7 +6,7 @@ const PORT = 4000;
 const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(`mongodb://0.0.0.0:27017/forum`, {
+    const conn = await mongoose.connect(`mongodb://localhost:27017/forum`, {
       useNewUrlParser: true,
     });
     console.log(`MongoDB Connected: {conn.connection.host}`);
@@ -102,19 +102,21 @@ const threadSchema = new mongoose.Schema({
   id: String,
   title: String,
   userId: String,
+  tag: String,
   replies: [],
   likes: [],
 });
 const Thread = mongoose.model("Thread", threadSchema);
 
 app.post("/api/create/thread", async (req, res) => {
-  const { thread, id } = req.body;
+  const { thread, id, tag  } = req.body;
   console.log(id);
   const threadId = generateID();
   const newThread = Thread({
     id: threadId,
     title: thread,
     userId: id,
+    tag: tag,
     replies: [],
     likes: [],
   });
