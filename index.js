@@ -6,9 +6,13 @@ const PORT = 4000;
 const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(`mongodb://localhost:27017/forum`, {
+    // const conn = await mongoose.connect(`mongodb://0.0.0.0:27017/forum`, {
+    //   useNewUrlParser: true,
+    // });
+    const conn = await mongoose.connect(`mongodb+srv://umutbaran1:lHXBmvST607W7bld@cluster0.waqvr7w.mongodb.net/`, {
+      dbName:'Cluster0',
       useNewUrlParser: true,
-    });
+      useUnifiedTopology: true,});
     console.log(`MongoDB Connected: {conn.connection.host}`);
   } catch (error) {
     console.error(error.message);
@@ -101,6 +105,7 @@ app.post("/api/login", async (req, res) => {
 const threadSchema = new mongoose.Schema({
   id: String,
   title: String,
+  description: String,
   userId: String,
   tag: String,
   replies: [],
@@ -109,14 +114,15 @@ const threadSchema = new mongoose.Schema({
 const Thread = mongoose.model("Thread", threadSchema);
 
 app.post("/api/create/thread", async (req, res) => {
-  const { thread, id, tag  } = req.body;
+  const { thread, id, selectedOption, description  } = req.body;
   console.log(id);
   const threadId = generateID();
   const newThread = Thread({
     id: threadId,
     title: thread,
     userId: id,
-    tag: tag,
+    tag: selectedOption,
+    description: description,
     replies: [],
     likes: [],
   });
@@ -124,6 +130,8 @@ app.post("/api/create/thread", async (req, res) => {
     () => console.log("added new thread."),
     (err) => console.log(err)
   );
+  const threadList = await Thread.find().exec();
+
 
   res.json({
     message: "Thread created successfully!",
@@ -162,6 +170,7 @@ app.post("/api/thread/replies", async (req, res) => {
   res.json({
     replies: result[0].replies,
     title: result[0].title,
+    description: result[0].description,
   });
 });
 
